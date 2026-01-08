@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>路人 vs 百業 交易漲幅試算</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+        :root {
+            --items-gap: 0px;
+            --items-padding: 0px;
+            --max-content-width: 100%;
+        }
+
+        /* 全域重置與背景 */
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #222;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 置中內容容器（計算區會放在這裡） */
+        .container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            /* 水平置中整組內容 */
+            flex-wrap: nowrap;
+            /* 同一行顯示（窄螢幕會改為直列） */
+            max-width: var(--max-content-width);
+            /* 若你有最大寬度限制，保留或改成 none */
+            margin: 0px auto 0;
+            /* 上方間距，左右自動置中 */
+            padding: 0 12px;
+            /* 可選：左右內距，避免貼齊邊緣 */
+            box-sizing: border-box;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        /* ---------- Full-bleed items 區（撐滿視窗寬度） ---------- */
+        .items-fullbleed {
+            width: 100vw;
+            /* 撐滿視窗 */
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            /* 讓元素延伸到視窗最左 */
+            margin-right: -50vw;
+            padding: var(--items-padding) 12px;
+            background: #ffffff;
+            /* 若要透明可改為 transparent */
+            border-radius: 0;
+            /* 移除圓角避免白邊 */
+            box-shadow: none;
+            /* 移除陰影避免視覺留白 */
+            box-sizing: border-box;
+        }
+
+        /* items grid：自動調整欄數並填滿容器 */
+        .items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--items-gap);
+            align-items: stretch;
+        }
+
+        .item {
+            background: #fafafa;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+            transition: transform 180ms cubic-bezier(.2, .9, .2, 1), box-shadow 180ms ease;
+
+        }
+
+        .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .item.active {
+            transform: scale(1.06);
+            border: 2px solid #ff0000;
+            /* 橘色或你想要的強烈色 */
+            box-shadow: 0 12px 30px rgba(255, 87, 34, 0.18);
+        }
+
+
+
+        /* 讓整個 items-cost 區塊置中（水平置中於父容器） */
+        .items-cost {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            /* 水平置中整組內容 */
+            flex-wrap: nowrap;
+            /* 同一行顯示（窄螢幕會改為直列） */
+            max-width: var(--max-content-width);
+            /* 若你有最大寬度限制，保留或改成 none */
+            margin: 12px auto 0;
+            /* 上方間距，左右自動置中 */
+            padding: 0 12px;
+            /* 可選：左右內距，避免貼齊邊緣 */
+            box-sizing: border-box;
+        }
+
+        /* label 不換行，避免被截斷到下一行 */
+        .items-cost .label {
+            white-space: nowrap;
+            flex: 0 0 auto;
+            /* 固定寬度由內容決定 */
+            margin-right: 6px;
+        }
+
+        /* input 在 flex 內可縮放並填滿剩餘空間 */
+        .items-cost input {
+            width: 300px;
+            /* 固定寬度，改成你要的 px */
+            min-width: 0;
+            /* 允許在 flex 容器內縮小（關鍵） */
+        }
+
+
+
+        /* ---------- 計算區（置中） ---------- */
+        .calc-wrapper {
+            margin-top: 18px;
+        }
+
+        .calc-box {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            background: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            box-sizing: border-box;
+        }
+
+        .box.small {
+            width: 360px;
+            max-width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .result {
+            margin-top: 8px;
+            font-weight: 700;
+        }
+
+        .highlight {
+            color: red;
+        }
+
+        /* 響應式：窄螢幕時調整 */
+        @media (max-width:900px) {
+            .items-fullbleed {
+                padding: 8px;
+            }
+
+            .items {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 8px;
+            }
+
+            .calc-box {
+                flex-direction: column;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 標題置中（在 container 內） -->
+    <div class="container">
+        <div class="title">路人 vs 百業 交易漲幅對比</div>
+    </div>
+
+    <!-- items 區：full-bleed（撐滿視窗左右） -->
+    <div class="items-fullbleed" id="itemsFull">
+        <div class="items" id="items"></div>
+    </div>
+
+    <!-- 計算區（置中 container） -->
+    <!-- 成本欄（視覺屬於 full-bleed，但內容寬度受限於 max-content-width） -->
+    <div class="items-cost">
+        <div class="label">成本(選擇物品或手動輸入)</div>
+        <input id="cost" type="number" placeholder="選擇物品 或 手動輸入（點擊自動填入成本）" />
+    </div>
+    <div class="container">
+        <div class="calc-wrapper">
+            <div class="calc-box">
+                <div class="box small">
+                    <h2 style="margin:0 0 8px 0;">路人交易</h2>
+                    <div style="font-weight:700; margin-bottom:6px;"></div>
+                    <label>成交價</label>
+                    <input id="sell_r" type="number" step="1" value="280" />
+                    <label>漲幅 (%)</label>
+                    <input id="markup_r" type="number" value="300" />
+                    <div id="baUp" class="result"></div>
+                    <div id="baUp2" class="result" style="font-weight:400; margin-top:6px;"></div>
+                    <div class="result" id="result_r"></div>
+                </div>
+
+                <div class="box small">
+                    <h2 style="margin:0 0 8px 0;">百業交易</h2>
+                    <label>漲幅 (%)</label>
+                    <input id="markup_b" type="number" value="0" />
+                    <label>市買率 (%)（滿等=1）</label>
+                    <input id="tax_b" type="number" value="1" step="0.5" />
+                    <label>短陌錢加成 (%)（滿等=14.5）</label>
+                    <input id="bonus_b" type="number" value="14.5" step="0.5" />
+                    <div class="result" id="result_b"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ---------- items 資料與建立 ---------- */
+        const itemsData = [
+            { img: 'https://images4.imagebam.com/8f/2d/05/ME19HW5Z_o.png', cost: 95 },
+            { img: 'https://images4.imagebam.com/88/fd/c5/ME19HW6I_o.png', cost: 95 },
+            { img: 'https://images4.imagebam.com/52/a4/20/ME19HW6X_o.png', cost: 85 },
+            { img: 'https://images4.imagebam.com/9a/3b/ac/ME19HW6G_o.png', cost: 70 },
+            { img: 'https://images4.imagebam.com/12/64/9a/ME19HW6E_o.png', cost: 65 },
+            { img: 'https://images4.imagebam.com/61/e7/c2/ME19HW6Q_o.png', cost: 60 },
+            { img: 'https://images4.imagebam.com/ee/cd/63/ME19HW65_o.png', cost: 60 },
+            { img: 'https://images4.imagebam.com/bb/31/51/ME19HW71_o.png', cost: 55 },
+            { img: 'https://images4.imagebam.com/c4/6e/b6/ME19HW61_o.png', cost: 45 },
+            { img: 'https://images4.imagebam.com/94/3b/60/ME19HW6T_o.png', cost: 45 },
+            { img: 'https://images4.imagebam.com/d1/d8/49/ME19HW6A_o.png', cost: 45 },
+            { img: 'https://images4.imagebam.com/15/99/40/ME19HW6U_o.png', cost: 36 },
+            { img: 'https://images4.imagebam.com/0f/f0/bb/ME19HW6Z_o.png', cost: 35 },
+            { img: 'https://images4.imagebam.com/97/a3/27/ME19HW74_o.png', cost: 35 },
+            { img: 'https://images4.imagebam.com/41/ba/a6/ME19HW6M_o.png', cost: 35 },
+            { img: 'https://images4.imagebam.com/2c/76/71/ME19HW6K_o.png', cost: 30 },
+            { img: 'https://images4.imagebam.com/28/76/d1/ME19HW6O_o.png', cost: 30 },
+            { img: 'https://images4.imagebam.com/a4/3c/a1/ME19HW63_o.png', cost: 25 },
+            { img: 'https://images4.imagebam.com/6c/bf/21/ME19HW68_o.png', cost: 25 },
+            { img: 'https://images4.imagebam.com/29/e2/29/ME19HW60_o.png', cost: 25 },
+            { img: 'https://images4.imagebam.com/d7/d1/ec/ME19HW6C_o.png', cost: 20 }
+        ];
+
+        const itemsEl = document.getElementById('items');
+        itemsData.forEach(it => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `<img src="${it.img}" title="成本 ${it.cost}">`;
+            div.addEventListener('click', () => {
+                document.querySelectorAll('.item').forEach(e => e.classList.remove('active'));
+                div.classList.add('active');
+                document.getElementById('cost').value = it.cost;
+                syncSellFromMarkup();
+                calc();
+            });
+            itemsEl.appendChild(div);
+        });
+
+        /* ---------- 元件參考 ---------- */
+        const costEl = document.getElementById('cost');
+        const sellREl = document.getElementById('sell_r');
+        const markupRInput = document.getElementById('markup_r');
+        const markupBInput = document.getElementById('markup_b');
+        const taxBInput = document.getElementById('tax_b');
+        const bonusBInput = document.getElementById('bonus_b');
+
+        /* ---------- 同步與計算（保留原本邏輯） ---------- */
+        let isSyncing = false;
+
+        sellREl.addEventListener('input', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const cost = parseFloat(costEl.value) || 0;
+            const sell = parseFloat(sellREl.value) || 0;
+            if (cost <= 0) {
+                markupRInput.value = '';
+            } else {
+                const mr = (sell / cost - 1) * 100;
+                markupRInput.value = isFinite(mr) ? mr.toFixed(4).replace(/\.?0+$/, '') : '';
+            }
+            calc();
+            isSyncing = false;
+        });
+
+        markupRInput.addEventListener('input', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            syncSellFromMarkup();
+            calc();
+            isSyncing = false;
+        });
+
+        costEl.addEventListener('input', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            syncSellFromMarkup();
+            calc();
+            isSyncing = false;
+        });
+
+        function syncSellFromMarkup() {
+            const cost = parseFloat(costEl.value) || 0;
+            const mr = (parseFloat(markupRInput.value) || 0) / 100;
+            if (cost <= 0) {
+                sellREl.value = '';
+            } else {
+                const sell = cost * (1 + mr);
+                sellREl.value = isFinite(sell) ? sell.toFixed(2).replace(/\.?0+$/, '') : '';
+            }
+        }
+
+        function calc() {
+            const cost = parseFloat(costEl.value) || 0;
+            const sell_r = parseFloat(sellREl.value);
+            const mr = (parseFloat(markupRInput.value) || 0) / 100;
+            const tr = 11 / 100;
+            const sell_r_effective = isFinite(sell_r) && sellREl.value !== '' ? sell_r : (cost * (1 + mr));
+            const income_r_raw = sell_r_effective * (1 - tr);
+            const income_r = Math.round(income_r_raw);
+
+            const mb_input = (parseFloat(markupBInput.value) || 0) / 100;
+            const tb = (parseFloat(taxBInput.value) || 0) / 100;
+            const bb = (parseFloat(bonusBInput.value) || 0) / 100;
+
+            const sell_b_input = cost * (1 + mb_input);
+            const afterTax_b_input = sell_b_input * (1 - tb);
+            const income_b_input_raw = afterTax_b_input * (1 + bb);
+            const income_b_input = Math.round(income_b_input_raw);
+
+            const resultREl = document.getElementById('result_r');
+            const resultBEl = document.getElementById('result_b');
+
+            const rIsHigher = income_r > income_b_input;
+            const bIsHigher = income_b_input > income_r;
+
+            const rHtml = `成交價：${sell_r_effective.toFixed(0)}<br>實際收入：<span class="${rIsHigher ? 'highlight' : ''}">${income_r}</span>　市買稅 -11%`;
+            const bHtml = `成交價：${sell_b_input.toFixed(0)}<br>實際收入：<span class="${bIsHigher ? 'highlight' : ''}">${income_b_input}</span>`;
+
+            resultREl.innerHTML = rHtml;
+            resultBEl.innerHTML = bHtml;
+
+            const baDiv = document.getElementById('baUp');
+            const baDiv2 = document.getElementById('baUp2');
+
+            const denom = cost * (1 - tb) * (1 + bb);
+            if (cost <= 0 || denom === 0) {
+                baDiv.textContent = '等同百業漲幅 ≈ 請輸入成本';
+                baDiv2.textContent = '請確認成本、稅率與加成是否正確（不可為 0 ）';
+            } else {
+                const ba = (income_r_raw / denom) - 1;
+                const baPercent = ba * 100;
+                baDiv.textContent = `等同百業漲幅 ≈ ${baPercent.toFixed(0)} %`;
+                baDiv2.innerHTML = `依據：百業稅率 ${(tb * 100).toFixed(1)}%，短陌錢加成 ${(bb * 100).toFixed(1)}%`;
+            }
+        }
+
+        ['markup_b', 'tax_b', 'bonus_b'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calc);
+        });
+
+        /* ---------- 初始化 ---------- */
+        window.addEventListener('load', () => {
+            syncSellFromMarkup();
+            calc();
+        });
+    </script>
+</body>
+
+</html>
