@@ -207,11 +207,37 @@
         font-size: 28px;
       }
     }
-    
+    .jump-btn-wrap {
+      position: absolute;
+      top: 15px;
+      left:15px;
+      z-index: 100;
+    }
+    .jump-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #475569;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: all 0.2s;
+    }
+    .jump-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
   </style>
 </head>
 
 <body>
+  <div class="jump-btn-wrap">
+    <a href="https://s9926030.github.io/mmw16sell.github.io/MysticSkills.html" id="jumpToMystic" class="jump-btn">奇術突破材料試算網頁</a>
+  </div>
   <!-- 語言切換按鈕 -->
   <div class="lang-switch" aria-hidden="false">
     <label data-i18n="ai_label">網頁製作人：AI</label>
@@ -221,7 +247,7 @@
 
   <!-- 標題置中（在 container 內） -->
   <div class="container">
-    <div class="title" data-i18n="title">路人 vs 百業 交易漲幅對比</div>
+    <div class="title" data-i18n="title" style="height:52px;">路人 vs 百業 交易漲幅對比</div>
   </div>
 
   <!-- items 區：full-bleed（撐滿視窗左右） -->
@@ -287,7 +313,8 @@
         "ba_basis": " <strong>百業稅率 {tax}%，短陌錢加成 {bonus}% <strong>",
         "ba_equal_r_from_b": "等同路人漲幅 ≈ 請輸入成本",
         "ba_basis_r_from_b": "依據：市買稅 {tax}%，短陌錢加成 {bonus}%",
-        "ai_label": "製作人：AI"
+        "ai_label": "製作人：AI",
+        "jump_btn_text": "前往奇術突破材料試算網頁"
       },
       "en": {
         "title": "Passerby vs Guild Price Fluctuation Comparison",
@@ -308,7 +335,8 @@
         "ba_basis": " <strong><label style:'width:100%';>Market Tax {tax}%<br>Commerce Coins Acquisition Efficiency {bonus}% <strong>",
         "ba_equal_r_from_b": "Equivalent Passerby Fluctuation ≈ please enter cost",
         "ba_basis_r_from_b": "Based on: Market Tax {tax}%, Commerce Coins Acquisition Efficiency {bonus}%",
-        "ai_label": "Creator：AI"
+        "ai_label": "Creator：AI",
+        "jump_btn_text": "Mystic Skills Breakthrough Calculation"
       }
     };
 
@@ -327,6 +355,7 @@
 
     // 套用靜態翻譯（data-i18n / data-i18n-placeholder / data-i18n-title）
     function applyTranslations() {
+      document.getElementById('jumpToMystic').textContent = t('jump_btn_text');
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         el.innerHTML = t(key);
