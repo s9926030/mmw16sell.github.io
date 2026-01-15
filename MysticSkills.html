@@ -3,14 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>奇術突破材料試算</title>
+<title class="pagetitle" id="pagetitleid">奇術突破材料試算</title>
 <style>
   body{font-family: "Microsoft JhengHei", system-ui, Arial; background:#f6f8fb; color:#222; padding:18px;}
   .wrap{max-width:100%;margin:0 auto;background:#fff;padding:18px;border-radius:10px;box-shadow:0 8px 24px rgba(20,30,60,0.06);}
   h1{margin:0 0 0px 0;}
-  .wrap .muted{
-    display: none;
-  }
+  .title-center { margin: 0 auto; text-align: center; } /* 置中標題 */
+  .wrap .muted{ display: none; }
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:10px;}
   .card{background:#fbfdff;border:1px solid #eef2ff;border-radius:10px;padding:2px 0px 2px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;}
   .card .disabledOverlay {
@@ -42,14 +41,14 @@
   .materials{margin-top:0px;font-size:13px;color:#0b1220;}
   .totals .matItem { display:inline-flex; align-items:center; gap:8px; margin-right:12px; }
   .totals .matItem img { width:30px; height:30px; object-fit:contain; border-radius:6px; background:#fff; padding:0px; border:0px solid #eee; }
-  
+
   /* 按鈕區塊樣式調整 */
   .top-controls { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
   .langButtons { display:flex; gap:8px; }
   .langBtn { padding:6px 10px; border-radius:8px; border:1px solid #d1d5db; background:#fff; cursor:pointer; font-weight:600; }
   .langBtn.active { background:#0b69ff; color:#fff; border-color:#0b69ff; }
   .langBtn:focus { outline:3px solid rgba(11,105,255,0.18); }
-  
+
   /* 重置按鈕樣式 */
   .resetBtn { padding:6px 10px; border-radius:8px; border:1px solid #fee2e2; background:#fff1f2; color:#991b1b; cursor:pointer; font-weight:600; margin-left: auto; }
   .resetBtn:hover { background:#fee2e2; }
@@ -58,12 +57,38 @@
   .fake-input .left{ width:70px; height:29px; border-radius:8px; border:1px solid #dbe7ff; background:#fff; box-sizing:border-box; color:#0b1220; padding:2px; }
   .fake-input .right{ width:70px; height:29px; border-radius:8px; border:1px solid #dbe7ff; background:#fff; box-sizing:border-box; color:#0b1220; padding:2px; }
   .examplenote { font-size:13px;color:#475569;font-weight:700; }
+
+  /* materialTotals inline layout */
+  .material-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .material-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .owned-summary-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    background: #eef2ff;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #0b1220;
+  }
+  .owned-summary-inline img { width:50px; height:50px; object-fit:contain; border-radius:6px; background:#fff; }
+
   @media (max-width:640px){ .grid{grid-template-columns:repeat(2,1fr);} .top-controls { flex-direction: column; align-items: stretch; } .resetBtn { margin-left: 0; } }
 </style>
 </head>
 <body>
-<div class="wwm16sell" style="position: absolute;top:0px;right:1%">
-    <button id="tosellpage" type="button" class="sellpageto">市買司交易對比網頁</button>
+<div class="wwm16sell" style="position: absolute;top:0px;left:1%">
+    <a id="tosellpage" type="button" class="sellpageto" href="https://s9926030.github.io/mmw16sell.github.io/sell.html">市買司交易對比網頁</a>
 </div>
 <div class="wrap">
   <div class="top-controls">
@@ -82,7 +107,7 @@
   <div id="grid" class="grid" style="margin-top:12px;"></div>
 
   <div class="totals" id="totalsBox">
-    <div><strong>合計（所有奇術）</strong></div>
+    <div><strong>合計</strong></div>
     <div id="ironTotals" class="small"></div>
     <div id="materialTotals" class="materials"></div>
   </div>
@@ -103,8 +128,8 @@ const LANG = {
     skillLabelTier: "重",
     skillLabelRank: "段",
     totalsTitleLabel: "總計",
-    totalsTitleShort: "合計（所有奇術）",
-    ironLabel: "烏金鐵（分級）",
+    totalsTitleShort: "合計材料還需",
+    ironLabel: "烏金鐵 ",
     materialsTitle: "突破材料合計",
     excludedText: "已排除",
     eq6Label: "6級烏金鐵",
@@ -122,7 +147,8 @@ const LANG = {
     boxesNeededLabel: "需要：",
     resetBtn: "重置所有資料",
     resetConfirm: "確定要清除所有輸入資料並重置嗎？",
-    sellpageto: "前往市買司路人 vs 百業交易對比網頁"
+    sellpageto: "前往市買司路人 vs 百業交易對比網頁",
+    pagetitle: "奇術突破材料試算"
   },
   en: {
     title: "Mystic Skills Breakthrough Material Calculation",
@@ -130,8 +156,8 @@ const LANG = {
     skillLabelTier: "Tier",
     skillLabelRank: "Rank",
     totalsTitleLabel: "Total",
-    totalsTitleShort: "Total（All Mystic Skills）",
-    ironLabel: "Ebob Iron (by tier)",
+    totalsTitleShort: "Total Materials Need",
+    ironLabel: "Ebob Iron ",
     materialsTitle: "Breakthrough Materials Total",
     excludedText: "Excluded",
     eq6Label: "Lv.6 Ebob Iron",
@@ -149,7 +175,8 @@ const LANG = {
     boxesNeededLabel: "Needed:",
     resetBtn: "Reset All Data",
     resetConfirm: "Are you sure you want to clear all data and reset?",
-    sellpageto: "Passerby vs Guild Price Fluctuation Comparison"
+    sellpageto: "Passerby vs Guild Price Fluctuation Comparison",
+    pagetitle: "Mystic Skills Breakthrough Material Calculation"
   }
 };
 
@@ -208,41 +235,45 @@ const grid = document.getElementById('grid');
 const totalsBox = document.getElementById('totalsBox');
 const entries = [];
 
-// 資料儲存功能
+/* 儲存 / 還原（localStorage） */
 function saveData() {
-    const skillsData = entries.map(e => ({
-        rank: e.rank,
-        stage: e.stage,
-        excluded: e.excluded
-    }));
+  try {
+    const skillsData = entries.map(e => ({ rank: e.rank, stage: e.stage, excluded: !!e.excluded }));
     localStorage.setItem('mystic_skills_data', JSON.stringify(skillsData));
 
     const ownedData = { irons: {}, mats: {} };
-    for(let i=1; i<=6; i++) {
-        const el = document.getElementById(`ownedIron${i}`);
-        if(el) ownedData.irons[i] = el.value;
+    for (let i=1;i<=6;i++) {
+      const el = document.getElementById(`ownedIron${i}`);
+      if (el) ownedData.irons[i] = el.value || "0";
     }
     Object.keys(materialInfo).forEach(mat => {
-        const el = document.getElementById(`ownedMat_${mat}`);
-        if(el) ownedData.mats[mat] = el.value;
+      const el = document.getElementById(`ownedMat_${mat}`);
+      if (el) ownedData.mats[mat] = el.value || "0";
     });
     localStorage.setItem('mystic_owned_data', JSON.stringify(ownedData));
+    localStorage.setItem('mystic_lang', currentLang);
+  } catch (e) {
+    console.warn('saveData error', e);
+  }
 }
 
 function loadSkillsData() {
+  try {
     const json = localStorage.getItem('mystic_skills_data');
     return json ? JSON.parse(json) : null;
+  } catch (e) { return null; }
 }
-
 function loadOwnedData() {
+  try {
     const json = localStorage.getItem('mystic_owned_data');
     return json ? JSON.parse(json) : { irons: {}, mats: {} };
+  } catch (e) { return { irons: {}, mats: {} }; }
 }
 
 /* 建立技能卡片 */
 function buildCards() {
   grid.innerHTML = '';
-  const savedSkills = loadSkillsData(); 
+  const savedSkills = loadSkillsData();
 
   skills.forEach((s, idx) => {
     const card = document.createElement('div');
@@ -268,8 +299,8 @@ function buildCards() {
     `;
     grid.appendChild(card);
 
-    entries[idx] = {nameZh:s.zh, nameEn:s.en, rank:saved.rank, stage:saved.stage, result:null, excluded:saved.excluded, cardElement:card};
-    if(saved.excluded) card.classList.add('disabled');
+    entries[idx] = { nameZh: s.zh, nameEn: s.en, rank: saved.rank, stage: saved.stage, result: null, excluded: !!saved.excluded, cardElement: card };
+    if (saved.excluded) card.classList.add('disabled');
 
     const rankInput = card.querySelector('.rank');
     const stageInput = card.querySelector('.stage');
@@ -288,9 +319,7 @@ function buildCards() {
       const fullResult = calcToMaxForSkill(entries[idx].nameZh, rank, stage, false);
       const mats = fullResult.materials;
       let matHtml = '';
-      if (Object.keys(mats).length === 0) {
-        matHtml = '';
-      } else {
+      if (Object.keys(mats).length !== 0) {
         const parts = Object.entries(mats).map(([m,c]) => {
           const info = materialInfo[m] || {};
           const imgSrc = info.img || 'image/placeholder.png';
@@ -378,6 +407,7 @@ function buildCards() {
   })();
 }
 
+/* 計算單一技能到最高所需 */
 function calcToMaxForSkill(skillName, rank, stage, excluded) {
   const irons = {1:0,2:0,3:0,4:0,5:0,6:0};
   const materials = {};
@@ -405,6 +435,7 @@ function calcToMaxForSkill(skillName, rank, stage, excluded) {
   return {irons, total6Equivalent, materials};
 }
 
+/* 已擁有區塊（不再在此處建立 summary） */
 function ensureOwnedInputs() {
   if (document.getElementById('ownedMaterialsBox')) return;
   const box = document.createElement('div');
@@ -415,7 +446,6 @@ function ensureOwnedInputs() {
   box.style.borderRadius = '8px';
   box.innerHTML = `
     <div style="font-weight:700;margin-bottom:6px;" id="ownedTitle">${LANG[currentLang].ownedTitle}</div>
-    <div style="font-size:13px;color:#475569;margin-bottom:8px;" id="ownedNote">${LANG[currentLang].ownedNote}</div>
     <div id="ownedInputsRow"></div>
     <div style="margin-top:0px;font-size:13px;color:#334155;" id="ownedResult"></div>
   `;
@@ -426,8 +456,8 @@ function ensureOwnedInputs() {
 function buildOwnedInputs() {
   const row = document.getElementById('ownedInputsRow');
   row.innerHTML = '';
-  
-  const savedData = loadOwnedData(); 
+
+  const savedData = loadOwnedData();
 
   const container = document.createElement('div');
   container.style.display = 'flex';
@@ -454,7 +484,7 @@ function buildOwnedInputs() {
     const wrap = document.createElement('div');
     wrap.style.display='flex'; wrap.style.flexDirection='column'; wrap.style.alignItems='center';
     wrap.style.minWidth='84px';
-    const val = savedData.irons[i] || 0; 
+    const val = savedData.irons && savedData.irons[i] ? savedData.irons[i] : 0;
     wrap.innerHTML = `<label style="font-size:13px;">${lvLabels[i]}</label><input type="number" min="0" value="${val}" id="ownedIron${i}" style="width:84px;padding:6px;border-radius:6px;border:1px solid #e6e9ef;text-align:center;">`;
     ironsRow.appendChild(wrap);
   }
@@ -471,46 +501,20 @@ function buildOwnedInputs() {
     const wrap = document.createElement('div');
     wrap.style.display='flex'; wrap.style.flexDirection='column'; wrap.style.alignItems='center';
     wrap.style.minWidth='140px';
-    const val = savedData.mats[mat] || 0; 
+    const val = savedData.mats && savedData.mats[mat] ? savedData.mats[mat] : 0;
     wrap.innerHTML = `<label style="font-size:13px;">${label}</label><input type="number" min="0" value="${val}" id="ownedMat_${mat}" style="width:140px;padding:6px;border-radius:6px;border:1px solid #e6e9ef;text-align:center;">`;
     matRow.appendChild(wrap);
   });
   row.appendChild(matRow);
 
-  const summaryWrap = document.createElement('div');
-  summaryWrap.style.marginTop = '10px';
-  summaryWrap.style.padding = '8px';
-  summaryWrap.style.background = '#eef2ff';
-  summaryWrap.style.borderRadius = '8px';
-  summaryWrap.style.fontSize = '14px';
-  summaryWrap.style.color = '#0b1220';
-  summaryWrap.id = 'ownedSummaryBoxStatic';
-  summaryWrap.innerHTML = `
-  <div style="font-weight:700;margin-bottom:6px;" id="totalMaterialsLabel">
-    ${LANG[currentLang].totalMaterialsDeficitLabel}- <span id="totalMaterialsRemainingVal">0</span>
-  </div>
-  <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:6px;">
-    <img src="image/90.png" alt="${LANG[currentLang].supportBoxLabelFull}"
-         style="width:50px;height:50px;object-fit:contain;border-radius:6px;background:#fff;" onerror="this.style.opacity=0.25;">
-    <div style="display:flex;flex-direction:column;gap:6px;">
-      <div style="font-size:13px;color:#0b1220;">
-        <strong>${LANG[currentLang].supportBoxLabelFull}</strong>
-      </div>
-      <div id="boxesNeededSummary" style="font-size:13px;color:#0b1220;">
-        ${LANG[currentLang].boxesNeededLabel} 0 ${currentLang==='zh' ? '箱' : 'boxes'}
-      </div>
-    </div>
-  </div>
-`;
-  row.appendChild(summaryWrap);
-
   const inputs = row.querySelectorAll('input');
   inputs.forEach(inp => inp.addEventListener('input', () => {
     updateTotals();
-    saveData(); 
+    saveData();
   }));
 }
 
+/* 計算鐵缺與材料缺 */
 function computeIronDeficit(totalIrons, ownedIrons) {
   const need = {};
   const surplus = {};
@@ -552,6 +556,7 @@ function applySupportBoxes(deficits, boxes) {
   return res;
 }
 
+/* updateTotals：列印材料並把 summary 放在同一行（靠右） */
 function updateTotals() {
   const totalIrons = {1:0,2:0,3:0,4:0,5:0,6:0};
   const totalMaterials = {};
@@ -604,41 +609,63 @@ function updateTotals() {
 
   const matBox = document.getElementById('materialTotals');
   matBox.innerHTML = '';
-  
-  if (Object.entries(matAfterBoxes).length === 0) {
-    const empty = document.createElement('div');
-    empty.textContent = `${LANG[currentLang].materialsTitle}: -`;
-    matBox.appendChild(empty);
-  } else {
-    const row = document.createElement('div');
-    row.style.marginTop = '8px';
-    Object.entries(matAfterBoxes).forEach(([mat, cnt]) => {
-      const item = document.createElement('div');
-      item.className = 'matItem';
-      const img = document.createElement('img');
-      img.src = (materialInfo[mat] && materialInfo[mat].img) ? materialInfo[mat].img : 'image/placeholder.png';
-      img.alt = mat;
-      img.onerror = function(){ this.style.opacity=0.25; };
-      const txt = document.createElement('div');
-      const matLabel = currentLang === 'zh' ? mat : (materialInfo[mat] ? materialInfo[mat].en : mat);
-      txt.textContent = `${matLabel} × ${cnt}`;
-      item.appendChild(img);
-      item.appendChild(txt);
-      row.appendChild(item);
-    });
-    matBox.appendChild(row);
-  }
 
+  // 建立一個水平列容器，內含所有材料項目（.material-row）
+  const materialRow = document.createElement('div');
+  materialRow.className = 'material-row';
+
+  // 先把 matAfterBoxes 轉成陣列，方便處理順序與插入 summary
+  const entriesArr = Object.entries(matAfterBoxes);
+
+  // 建立每個材料項目（.material-item）
+  entriesArr.forEach(([mat, cnt]) => {
+    const item = document.createElement('div');
+    item.className = 'material-item';
+    const img = document.createElement('img');
+    img.src = (materialInfo[mat] && materialInfo[mat].img) ? materialInfo[mat].img : 'image/placeholder.png';
+    img.alt = mat;
+    img.style.width = '30px';
+    img.style.height = '30px';
+    img.onerror = function(){ this.style.opacity=0.25; };
+    const txt = document.createElement('div');
+    const matLabel = currentLang === 'zh' ? mat : (materialInfo[mat] ? materialInfo[mat].en : mat);
+    txt.textContent = `${matLabel} × ${cnt}`;
+    item.appendChild(img);
+    item.appendChild(txt);
+    materialRow.appendChild(item);
+  });
+
+  // 建立 inline summary（會在同一行，並靠右）
+  const summary = document.createElement('div');
+  summary.className = 'owned-summary-inline';
+  summary.id = 'ownedSummaryInTotals';
+  summary.innerHTML = `
+    <div style="font-weight:700;">${LANG[currentLang].totalMaterialsDeficitLabel} <span id="totalMaterialsRemainingVal">${totalMaterialsRemaining}</span></div>
+    <img src="image/90.png" alt="${LANG[currentLang].supportBoxLabelFull}" onerror="this.style.opacity=0.25;"style="width:40px;height:40px;">
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="font-size:13px;color:#0b1220;"><strong>${LANG[currentLang].supportBoxLabelFull}</strong></div>
+      <div id="boxesNeededSummary" style="font-size:13px;color:#0b1220;">${LANG[currentLang].boxesNeededLabel} ${boxesNeeded} ${currentLang==='zh' ? '箱' : 'boxes'}</div>
+    </div>
+    
+  `;
+
+  // 把材料列與 summary 一起加入 matBox（summary 放在同一行的最右側）
+  matBox.appendChild(materialRow);
+  matBox.appendChild(summary);
+
+  // 更新可能存在的 summary 裡的數值（若使用者在其他地方也有顯示）
   const totalMaterialsRemainingVal = document.getElementById('totalMaterialsRemainingVal');
   if (totalMaterialsRemainingVal) totalMaterialsRemainingVal.textContent = totalMaterialsRemaining;
   const boxesNeededSummary = document.getElementById('boxesNeededSummary');
   if (boxesNeededSummary) boxesNeededSummary.textContent = `${LANG[currentLang].boxesNeededLabel} ${boxesNeeded} ${currentLang==='zh' ? '箱' : 'boxes'}`;
 }
 
+/* 語言與按鈕 */
 const btnZh = document.getElementById('btnZh');
 const btnEn = document.getElementById('btnEn');
 const btnReset = document.getElementById('btnReset');
 const btnSellPage = document.getElementById('tosellpage');
+const pagetitle = document.getElementById('pagetitleid');
 
 function setLang(lang) {
   currentLang = lang;
@@ -651,47 +678,92 @@ function setLang(lang) {
     btnEn.classList.add('active'); btnEn.setAttribute('aria-pressed','true');
     btnZh.classList.remove('active'); btnZh.setAttribute('aria-pressed','false');
   }
-  
-  document.querySelector('.wrap h1').textContent = LANG[currentLang].title;
+
+  const h1 = document.querySelector('.wrap h1');
+  if (h1) h1.textContent = LANG[currentLang].title;
   const muted = document.querySelector('.wrap .muted');
   if (muted) muted.textContent = LANG[currentLang].subtitle;
-  if(btnReset) btnReset.textContent = LANG[currentLang].resetBtn;
-  
-  // 新增：更新交易按鈕文字
-  if(btnSellPage) btnSellPage.textContent = LANG[currentLang].sellpageto;
-
+  if (btnReset) btnReset.textContent = LANG[currentLang].resetBtn;
+  if (btnSellPage) btnSellPage.textContent = LANG[currentLang].sellpageto;
+  if (pagetitle) pagetitle.textContent = LANG[currentLang].pagetitle;
   buildCards();
   const ownedBox = document.getElementById('ownedMaterialsBox');
   if (ownedBox) ownedBox.remove();
   ensureOwnedInputs();
   updateTotals();
+  saveData();
 }
 
-btnZh.addEventListener('click', () => setLang('zh'));
-btnEn.addEventListener('click', () => setLang('en'));
-
-btnReset.addEventListener('click', () => {
-    if(confirm(LANG[currentLang].resetConfirm)) {
-        localStorage.removeItem('mystic_skills_data');
-        localStorage.removeItem('mystic_owned_data');
-        location.reload();
-    }
-});
-
-// 交易按鈕的連結 (目前是空連結，請替換成真實網址)
-if(btnSellPage) {
-    btnSellPage.addEventListener('click', () => {
-        window.location.href = 'https://s9926030.github.io/mmw16sell.github.io/sell.html'; // 請將 # 換成目標網址
-    });
-}
-
+if (btnZh) btnZh.addEventListener('click', () => setLang('zh'));
+if (btnEn) btnEn.addEventListener('click', () => setLang('en'));
 document.addEventListener('keydown', (e) => {
   if (e.altKey && (e.key === 'l' || e.key === 'L')) {
     setLang(currentLang === 'zh' ? 'en' : 'zh');
   }
 });
 
+/* 重置按鈕行為 */
+if (btnReset) {
+  btnReset.addEventListener('click', () => {
+    const confirmMsg = LANG[currentLang].resetConfirm || '確定要清除所有輸入資料並重置嗎？';
+    if (!confirm(confirmMsg)) return;
+
+    // 1) 清除儲存的資料（保留語言偏好）
+    localStorage.removeItem('mystic_skills_data');
+    localStorage.removeItem('mystic_owned_data');
+
+    // 2) 重新建立卡片與已擁有區（會使用預設值）
+    buildCards();
+    const ownedBox = document.getElementById('ownedMaterialsBox');
+    if (ownedBox) ownedBox.remove();
+    ensureOwnedInputs();
+
+    // 3) 明確把所有已擁有的 input 設為 0（避免舊值殘留）
+    for (let i = 1; i <= 6; i++) {
+      const el = document.getElementById(`ownedIron${i}`);
+      if (el) el.value = 0;
+    }
+    Object.keys(materialInfo).forEach(mat => {
+      const el = document.getElementById(`ownedMat_${mat}`);
+      if (el) el.value = 0;
+    });
+
+    // 4) 更新畫面與儲存（若你想把清空結果存回 localStorage）
+    updateTotals();
+    saveData();
+  });
+}
+
+/* 初始化 */
 setLang(currentLang);
+ensureOwnedInputs();
+updateTotals();
+
+/* DOMContentLoaded: 嘗試還原已儲存資料 */
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const savedOwned = loadOwnedData();
+    if (savedOwned) {
+      for (let i=1;i<=6;i++) {
+        const el = document.getElementById(`ownedIron${i}`);
+        if (el && savedOwned.irons && typeof savedOwned.irons[i] !== 'undefined') el.value = savedOwned.irons[i];
+      }
+      Object.keys(materialInfo).forEach(mat => {
+        const el = document.getElementById(`ownedMat_${mat}`);
+        if (el && savedOwned.mats && typeof savedOwned.mats[mat] !== 'undefined') el.value = savedOwned.mats[mat];
+      });
+    }
+    entries.forEach((e, idx) => {
+      const card = e.cardElement;
+      if (!card) return;
+      const rankInput = card.querySelector('.rank');
+      const stageInput = card.querySelector('.stage');
+      if (rankInput) rankInput.dispatchEvent(new Event('input', { bubbles: true }));
+      if (stageInput) stageInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    updateTotals();
+  }, 50);
+});
 </script>
 
 </body>
